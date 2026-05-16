@@ -1,0 +1,124 @@
+{% extends "auth_base.html" %}
+
+{% block title %}
+Welcome Email
+{% endblock %}
+
+{% block content %}
+
+<div style="
+    max-width:600px;
+    margin:auto;
+    background:#ffffff;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+">
+
+    <!-- Header -->
+    <div style="
+        background:linear-gradient(135deg,#4e73df,#224abe);
+        padding:45px 30px;
+        text-align:center;
+        color:white;
+    ">
+
+        <img
+            src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            width="90"
+            alt="Welcome"
+            style="margin-bottom:20px;"
+        >
+
+        <h1 style="
+            margin:0;
+            font-size:32px;
+            font-weight:700;
+        ">
+            Welcome {{ user.username }} 🎉
+        </h1>
+
+        <p style="
+            margin-top:10px;
+            font-size:16px;
+            opacity:0.95;
+        ">
+            Your account has been verified successfully
+        </p>
+
+    </div>
+
+    <!-- Body -->
+    <div style="
+        padding:40px 35px;
+        color:#333333;
+        line-height:1.8;
+    ">
+
+        <h2 style="
+            color:#224abe;
+            margin-bottom:15px;
+        ">
+            You're all set 🚀
+        </h2>
+
+        <p>
+            Thank you for joining <strong>Resume Builder</strong>.
+            Your email verification is complete and your account is now active.
+        </p>
+
+        <p>
+            You can now:
+        </p>
+
+        <ul style="
+            padding-left:20px;
+            margin-top:15px;
+            margin-bottom:25px;
+        ">
+            <li>Create professional resumes</li>
+            <li>Manage your portfolio website</li>
+            <li>Download PDF & DOCX resumes</li>
+            <li>Share your public resume link</li>
+        </ul>
+
+        <!-- Button -->
+        <div style="text-align:center; margin-top:35px;">
+
+            <a href="/admin"
+               style="
+                    display:inline-block;
+                    padding:14px 30px;
+                    background:#4e73df;
+                    color:white;
+                    text-decoration:none;
+                    border-radius:12px;
+                    font-weight:600;
+                    font-size:16px;
+               ">
+
+                Login Now
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div style="
+        background:#f8f9fc;
+        padding:20px;
+        text-align:center;
+        color:#6c757d;
+        font-size:14px;
+    ">
+
+        © 2026 Resume Builder.
+        All rights reserved.
+
+    </div>
+
+</div>
+
+{% endblock %}

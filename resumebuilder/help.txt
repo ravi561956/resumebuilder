@@ -1,0 +1,41 @@
+to start:
+1. venv\Scripts\activate
+2.for ect source venv/bin/activate
+3. python manage.py runserver
+
+to migrate:
+python manage.p
+python manage.py migrate
+
+sudo systemctl restart gunicorn
+
+sudo systemctl restart nginx
+to create user:
+python manage.py createsuperuser     
+
+important: check after failuer
+pip install django
+python -m django --version
+
+at setting.py 
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    ...
+    'resume',   # ✅ THIS MUST BE PRESENT
+]
+
+import os
+
+# Detect environment
+if os.name == 'nt':  # Windows
+    WKHTMLTOPDF_PATH = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+else:  # Linux (EC2)
+    WKHTMLTOPDF_PATH = '/usr/bin/wkhtmltopdf'
+
+
+module used:
+python-docx
+pdfkit
+Pillow

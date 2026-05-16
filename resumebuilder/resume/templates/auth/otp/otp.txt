@@ -1,0 +1,7 @@
+Hi {{ user.get_username }},
+
+Your OTP is: {{ otp }}
+
+This code expires in 5 minutes.
+
+If you didn’t request this, ignore.

@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>
+    Ravi Ranjan
+  </title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/fav.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid position-relative d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <!-- Uncomment the line below if you also wish to use an text logo -->
+        <!-- <h1 class="sitename">Style</h1>  -->
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+
+        <div class="profile-img">
+          <img src="{{ resume.profile_image_url }}" alt="" class="img-fluid rounded-circle">
+        </div>
+
+        <a href="index.html" class="logo d-flex align-items-center justify-content-center active">
+          <!-- Uncomment the line below if you also wish to use an image logo -->
+          <!-- <img src="assets/img/logo.webp" alt=""> -->
+          <h1 class="sitename">{{ resume.name }}</h1>
+        </a>
+        {% if resume.socials.all %}
+          <div class="social-links text-center">
+            {% for social in resume.socials.all %}
+              {% if social.is_active %}
+                  <a href="{{ social.url }}" target="_blank" class="mx-2 social-icon"><i class="{{ social.icon_class }}"></i></a>
+                {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+        <ul>
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#resume">Resume</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section">
+
+      <div class="container">
+        <div class="row g-0 align-items-center">
+
+          <div class="col-lg-6 hero-content" data-aos="fade-right" data-aos-delay="100">
+            <div class="content-wrapper">
+              <h1 class="hero-title">Creative <span class="typed" data-typed-items="{{ resume.tag_string }}"></span></h1>
+              <p class="lead">{{ resume.short_desc|safe }}</p>
+              {% if resume.stats.all %}
+                <div class="hero-stats" data-aos="fade-up" data-aos-delay="200">
+                  {% for stat in resume.stats.all %}
+                    <div class="stat-item">
+                      <span class="purecounter" data-purecounter-start="0" data-purecounter-end="{{ stat.value }}" data-purecounter-duration="2">0</span>
+                      <span class="stat-label">{{ stat.label }}</span>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <div class="hero-actions" data-aos="fade-up" data-aos-delay="300">
+                <a href="#portfolio" class="btn btn-primary">View My Work</a>
+                <a href="#contact" class="btn btn-outline">Get In Touch</a>
+              </div>
+              {% if resume.socials.all %}
+                <div class="social-links" data-aos="fade-up" data-aos-delay="400">
+                  {% for social in resume.socials.all %}
+                    {% if social.is_active %}
+                        <a href="{{ social.url }}" target="_blank" class="mx-2 social-icon"><i class="{{ social.icon_class }}"></i></a>
+                      {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="col-lg-6 hero-image" data-aos="fade-left" data-aos-delay="200">
+            <div class="image-container">
+              <div class="floating-elements">
+                {% for card in resume.floating_cards.all %}
+                  {% if card.is_active %}
+                    <div class="floating-card {{ card.card_class }}"
+                        data-aos="{{ card.aos_animation }}"
+                        data-aos-delay="{{ card.aos_delay }}">
+                      <i class="{{ card.icon_class }}"></i>
+                      <span>{{ card.title }}</span>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <img src="{{ resume.banner_image_url }}" alt="Portfolio Hero" class="img-fluid hero-main-image">
+              <div class="image-overlay"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section><!-- /Hero Section -->
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+
+      <!-- Section Title -->
+      <div class="container section-title">
+        <h2>About myself</h2>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row align-items-center">
+
+          <div class="col-lg-5" data-aos="fade-right" data-aos-delay="200">
+            <div class="profile-image-wrapper">
+              <div class="profile-image">
+                <img src="{{ resume.profile_image_url }}" alt="Profile" class="img-fluid">
+              </div>
+              <div class="signature-section info">
+                <h2>{{ resume.title }}</h2>
+                <h1>{{ resume.name }}</h1>       
+                <p>{{ resume.email }} | {{ resume.phone }}</p>
+                <p>
+                  <i class="fa fa-map-marker" aria-hidden="true"></i>
+                  {{ resume.address }}
+                </p>
+                <p class="quote">{{ resume.tag_line }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7" data-aos="fade-left" data-aos-delay="300">
+            <div class="about-content">
+              <div class="intro">
+                <h2>Hi, I'm {{ resume.name }} - {{ resume.position }}</h2>
+                <p>{{ resume.summary|safe }}</p>
+              </div>
+            {% if resume.journeys.all %}
+              <div class="journey-timeline"
+                  data-aos="fade-up"
+                  data-aos-delay="300">
+                  <h2>
+                    <i class="bi bi-mortarboard"></i>
+                    Academic Excellence
+                  </h2>
+                {% for item in resume.journeys.all %}
+                  {% if item.is_active %}
+                  <div class="timeline-item">
+                    <div class="year">{{ item.year }}</div>
+                    <div class="description">
+                      {{ item.description|safe }}
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+
+              </div>
+            {% endif %}
+
+              <div class="cta-section" data-aos="fade-up" data-aos-delay="400">
+                <div class="fun-fact">
+                  <span class="emoji">☕</span>
+                  <span class="text">Coffee-fueled developer based in India</span>
+                </div>
+                <div class="action-buttons">
+                  <a href="#portfolio" class="btn btn-primary">View My Work</a>
+                  <a href="{% url 'resume_pdf' %}" class="btn btn-outline">
+                    Download Resume (PDF)
+                  </a>
+                  <a href="{% url 'resume_doc' %}" class="btn btn-outline">
+                    Download Resume (DOC)
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /About Section -->
+
+    <!-- Skills Section -->
+    <section id="skills" class="skills section">
+      <div class="container section-title">
+        <h2>Technical Skills </h2>
+      </div>
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="skills-grid">
+              <div class="row g-12">
+                {% for category in resume.skill_categories.all %}
+                  {% if category.skills.all %}
+                    <div class="col-md-4"
+                        data-aos="flip-left"
+                        data-aos-delay="{{ category.aos_delay|default:200 }}">
+
+                      <div class="skill-card">
+
+                        <div class="skill-header">
+                          {% if category.icon_class %}
+                            <i class="{{ category.icon_class }}"></i>
+                          {% endif %}
+                          <h3>{{ category.title }}</h3>
+                        </div>
+
+                        <div class="skills-animation">
+
+                          {% for skill in category.skills.all %}
+                            <div class="skill-item">
+                              <div class="skill-info">
+                                <span class="skill-name">{{ skill.name }}</span>
+                                <span class="skill-percentage">{{ skill.percentage }}%</span>
+                              </div>
+
+                              <div class="skill-bar progress">
+                                <div class="progress-bar"
+                                    role="progressbar"
+                                    aria-valuenow="{{ skill.percentage }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                    style="width: {{ skill.percentage }}%;">
+                                </div>
+                              </div>
+
+                            </div>
+                          {% endfor %}
+
+                        </div>
+                      </div>
+                    </div>
+
+                  {% endif %}
+                {% empty %}
+                  <p class="text-muted">No skills added yet.</p>
+                {% endfor %}
+
+              </div>
+
+            </div><!-- End Skills Grid -->
+          </div>
+        </div>
+
+      </div>
+    </section><!-- /Skills Section -->
+
+    <!-- Resume Section -->
+    <section id="resume" class="resume section">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row">
+
+          {% for journey in resume.journey.all %}
+          <div class="col-lg-12"
+              data-aos="{% if forloop.first %}fade-right{% else %}fade-left{% endif %}"
+              data-aos-delay="{{ journey.aos_delay }}">
+
+            <div class="{% if forloop.first %}experience-section{% else %}education-section{% endif %}">
+
+              <div class="section-header">
+                <h2>
+                  <i class="{{ journey.icon_class }}"></i>
+                  {{ journey.title }}
+                </h2>
+                <p class="section-subtitle">{{ journey.short_desc|safe }}</p>
+              </div>
+
+              {% if forloop.first %}
+              <!-- EXPERIENCE -->
+              <div class="experience-cards">
+                {% for item in journey.excellences.all %}
+                {% if item.is_active %}
+                <div class="experience-card" data-aos="zoom-in">
+                  <div class="card-header">
+                    <div class="role-info">
+                      <h3>{{ item.title }}</h3>
+                      <h4>{{ item.company }}</h4>
+                    </div>
+                    <span class="duration">{{ item.date_range }}</span>
+                  </div>
+                  <div class="card-body">
+                    <p>{{ item.description|safe }}</p>
+                  </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+              </div>
+
+              {% else %}
+              <!-- EDUCATION -->
+              <div class="education-timeline">
+                <div class="timeline-track"></div>
+                {% for item in journey.excellences.all %}
+                {% if item.is_active %}
+                <div class="education-item" data-aos="slide-up">
+                  <div class="timeline-marker"></div>
+                  <div class="education-content">
+                    <div class="degree-header">
+                      <h3>{{ item.title }}</h3>
+                      <span class="year">{{ item.date_range }}</span>
+                    </div>
+                    <h4 class="institution">{{ item.company }}</h4>
+                    <p>{{ item.description|safe }}</p>
+                  </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+              </div>
+              {% endif %}
+
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+        {% if resume.professions.all %}
+          <div class="row">
+            {% for profession in resume.professions.all %}
+              <div class="col-lg-4">
+                <div class="skills-summary"
+                    data-aos="fade-left"
+                    data-aos-delay="{{ profession.aos_delay }}">
+                  <!-- ================= CERTIFICATIONS ================= -->
+                  {% if profession.certifications.all %}
+                    <div class="skills-badges"
+                        data-aos="fade-up"
+                        data-aos-delay="600">
+                      <h4>Certifications</h4>
+                      <div class="badge-list">
+                        {% for cert in profession.certifications.all %}
+                          {% if cert.is_active %}
+                            <div class="skill-badge">
+                              {{ cert.title }}
+                            </div>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% empty %}
+              <p>No professions found</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </section><!-- /Resume Section -->
+    <!-- Services Section -->
+    {% if resume.servicesection.all %}
+      <section id="services" class="services section">
+
+        {% for section in resume.servicesection.all %}
+
+        <!-- Section Title -->
+        <div class="container section-title"
+            data-aos="fade-up"
+            data-aos-delay="{{ section.aos_delay }}">
+          <h2>{{ section.title }}</h2>
+          <p>{{ section.subtitle|safe }}</p>
+        </div><!-- End Section Title -->
+
+        <div class="container"
+            data-aos="fade-up"
+            data-aos-delay="{{ section.aos_delay }}">
+          <div class="row g-4">
+
+            {% for service in section.services.all %}
+            {% if service.is_active %}
+            <div class="col-lg-4 col-md-6"
+                data-aos="fade-up"
+                data-aos-delay="{{ forloop.counter|add:'1' }}00">
+
+              <div class="service-item">
+                <div class="icon">
+                  <i class="{{ service.icon_class }}"></i>
+                </div>
+
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description|safe }}</p>
+
+                {% if service.learn_more_url %}
+                <div class="card-links">
+                  <a href="{{ service.learn_more_url }}" class="link-item">
+                    Learn More
+                    <i class="bi bi-arrow-right"></i>
+                  </a>
+                </div>
+                {% endif %}
+              </div>
+
+            </div><!-- End Service Item -->
+            {% endif %}
+            {% endfor %}
+
+          </div>
+        </div>
+
+        {% endfor %}
+
+      </section><!-- /Services Section -->
+    {% endif %}
+    <!-- Portfolio Section -->
+    {% if resume.portfolio_sections.all %}
+      <section id="portfolio" class="portfolio section">
+
+        {% for section in resume.portfolio_sections.all %}
+        {% if section.is_active %}
+
+        <!-- Section Title -->
+        <div class="container section-title">
+          <h2>{{ section.title }}</h2>
+          <p>{{ section.subtitle|safe }}</p>
+        </div><!-- End Section Title -->
+
+        <div class="container-fluid" data-aos="fade-up" data-aos-delay="100">
+
+          <div class="isotope-layout"
+              data-default-filter="*"
+              data-layout="masonry"
+              data-sort="original-order">
+
+            <!-- Filters -->
+            <ul class="portfolio-filters isotope-filters"
+                data-aos="fade-up"
+                data-aos-delay="200">
+
+              <li data-filter="*" class="filter-active">
+                <i class="bi bi-grid-3x3"></i> All Projects
+              </li>
+
+              {% for category in section.categories.all %}
+              <li data-filter=".filter-{{ category.slug }}">
+                {{ category.title }}
+              </li>
+              {% endfor %}
+            </ul>
+
+            <!-- Portfolio Grid -->
+            <div class="row g-4 isotope-container"
+                data-aos="fade-up"
+                data-aos-delay="300">
+
+              {% for item in section.items.all %}
+              {% if item.is_active %}
+
+              <div class="col-xl-3 col-lg-4 col-md-6
+                          portfolio-item isotope-item
+                          {% for cat in item.categories.all %}
+                            filter-{{ cat.slug }}
+                          {% endfor %}">
+
+                <article class="portfolio-entry">
+                  <figure class="entry-image">
+
+                    <img src="{{ item.image.url }}"
+                        class="img-fluid"
+                        alt="{{ item.title }}"
+                        loading="lazy">
+
+                    <div class="entry-overlay">
+                      <div class="overlay-content">
+
+                        <div class="entry-meta">
+                          {% for cat in item.categories.all %}
+                            {{ cat.title }}{% if not forloop.last %}, {% endif %}
+                          {% endfor %}
+                        </div>
+
+                        <h3 class="entry-title">{{ item.title }}</h3>
+
+                        <div class="entry-links">
+                          <a href="{{ item.image.url }}"
+                            class="glightbox"
+                            data-gallery="portfolio-gallery"
+                            data-glightbox="title: {{ item.title }};">
+                            <i class="bi bi-arrows-angle-expand"></i>
+                          </a>
+
+                          {% if item.project_url %}
+                          <a href="{{ item.project_url }}">
+                            <i class="bi bi-arrow-right"></i>
+                          </a>
+                          {% endif %}
+                        </div>
+
+                      </div>
+                    </div>
+
+                  </figure>
+                </article>
+
+              </div><!-- End Portfolio Item -->
+              {% endif %}
+              {% endfor %}
+
+            </div><!-- End Portfolio Container -->
+
+          </div>
+
+        </div>
+
+        {% endif %}
+        {% endfor %}
+
+      </section><!-- /Portfolio Section -->
+    {% endif %}
+    <!-- Testimonials Section -->
+    {% if resume.testimonial_sections.all %}
+      <section id="testimonials" class="testimonials section">
+
+        {% for section in resume.testimonial_sections.all %}
+        {% if section.is_active %}
+
+        <!-- Section Title -->
+        <div class="container section-title">
+          <h2>{{ section.title }}</h2>
+          <p>{{ section.subtitle|safe }}</p>
+        </div><!-- End Section Title -->
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+          <!-- ================= CRITIC REVIEWS ================= -->
+          <div class="row">
+            <div class="col-12">
+              <div class="critic-reviews" data-aos="fade-up" data-aos-delay="300">
+                <div class="row">
+
+                  {% for testimonial in section.testimonials.all|slice:":3" %}
+                  {% if testimonial.is_active %}
+                  <div class="col-md-4">
+                    <div class="critic-review">
+                      <div class="review-quote">"</div>
+
+                      <div class="stars">
+                        {% for i in "12345"|slice:":testimonial.rating" %}
+                          <i class="bi bi-star-fill"></i>
+                        {% endfor %}
+                      </div>
+
+                      <p>{{ testimonial.quote|safe }}</p>
+
+                      <div class="critic-info">
+                        <div class="critic-name">{{ testimonial.source }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% endfor %}
+
+                </div>
+              </div>
+
+              <!-- ================= SLIDER ================= -->
+              <div class="testimonials-container">
+                <div class="swiper testimonials-slider init-swiper"
+                    data-aos="fade-up"
+                    data-aos-delay="400">
+
+                  <script type="application/json" class="swiper-config">
+                    {
+                      "loop": true,
+                      "speed": 600,
+                      "autoplay": { "delay": 5000 },
+                      "slidesPerView": 1,
+                      "spaceBetween": 30,
+                      "pagination": {
+                        "el": ".swiper-pagination",
+                        "type": "bullets",
+                        "clickable": true
+                      },
+                      "breakpoints": {
+                        "768": { "slidesPerView": 2 },
+                        "992": { "slidesPerView": 3 }
+                      }
+                    }
+                  </script>
+
+                  <div class="swiper-wrapper">
+
+                    {% for testimonial in section.testimonials.all %}
+                    {% if testimonial.is_active %}
+                    <div class="swiper-slide">
+                      <div class="testimonial-item">
+
+                        <div class="stars">
+                          {% for i in "12345"|slice:":testimonial.rating" %}
+                            <i class="bi bi-star-fill"></i>
+                          {% endfor %}
+                        </div>
+
+                        <p>{{ testimonial.quote }}</p>
+
+                        <div class="testimonial-profile">
+                          {% if testimonial.author_image %}
+                          <img src="{{ testimonial.author_image.url }}"
+                              class="img-fluid rounded-circle"
+                              alt="{{ testimonial.author_name }}">
+                          {% endif %}
+                          <div>
+                            <h3>{{ testimonial.author_name }}</h3>
+                            {% if testimonial.author_role %}
+                            <h4>{{ testimonial.author_role }}</h4>
+                            {% endif %}
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+
+                  </div>
+
+                  <div class="swiper-pagination"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= OVERALL RATING ================= -->
+          <div class="row">
+            <div class="col-12 text-center" data-aos="fade-up">
+              <div class="overall-rating">
+                <div class="rating-number">{{ section.average_rating }}</div>
+
+                <div class="rating-stars">
+                  {% for i in "12345"|slice:":section.average_rating|floatformat:0" %}
+                    <i class="bi bi-star-fill"></i>
+                  {% endfor %}
+                </div>
+
+                <p>Based on {{ section.total_reviews }}+ reviews</p>
+
+                <div class="rating-platforms">
+                  {% for platform in section.platforms.all %}
+                    <span>{{ platform.name }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {% endif %}
+        {% endfor %}
+
+      </section><!-- /Testimonials Section -->
+    {% endif %}
+    <!-- Faq Section -->
+    {% if resume.faq_sections.all %}
+      <section id="faq" class="faq section">
+
+        {% for section in resume.faq_sections.all %}
+        {% if section.is_active %}
+
+        <!-- Section Title -->
+        <div class="container section-title">
+          <h2>{{ section.title }}</h2>
+          <p>{{ section.subtitle|safe }}</p>
+        </div><!-- End Section Title -->
+
+        <div class="container">
+          <div class="row justify-content-center">
+
+            <div class="col-lg-12"
+                data-aos="fade-up"
+                data-aos-delay="100">
+
+              <div class="faq-container">
+
+                {% for faq in section.faqs.all %}
+                {% if faq.is_active %}
+                <div class="faq-item {% if forloop.first %}faq-active{% endif %}">
+                  <h3>{{ faq.question }}</h3>
+
+                  <div class="faq-content">
+                    <p>{{ faq.answer|safe }}</p>
+                  </div>
+
+                  <i class="faq-toggle bi bi-chevron-right"></i>
+                </div><!-- End Faq item-->
+                {% endif %}
+                {% endfor %}
+
+              </div>
+
+            </div><!-- End Faq Column-->
+
+          </div>
+        </div>
+
+        {% endif %}
+        {% endfor %}
+
+      </section><!-- /Faq Section -->
+    {% endif %}
+
+    <!-- Contact Section -->
+    {% if resume.contact_sections.all %}
+      <section id="contact" class="contact section light-background">
+
+        {% for section in resume.contact_sections.all %}
+        {% if section.is_active %}
+
+        <!-- Section Title -->
+        <div class="container section-title">
+          <h2>{{ section.title }}</h2>
+          <p>{{ section.subtitle|safe }}</p>
+        </div><!-- End Section Title -->
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+          <div class="row g-4 g-lg-5">
+
+            <!-- ================= LEFT INFO PANEL ================= -->
+            <div class="col-lg-5">
+              <div class="info-box" data-aos="fade-up" data-aos-delay="200">
+
+                <h3>Contact Info</h3>
+                <p>{{ section.description|safe }}</p>
+
+                <!-- Location -->
+                <div class="info-item" data-aos="fade-up" data-aos-delay="300">
+                  <div class="icon-box">
+                    <i class="bi bi-geo-alt"></i>
+                  </div>
+                  <div class="content">
+                    <h4>Our Location</h4>
+                    {% for line in section.location.splitlines %}
+                    <p>{{ line }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <!-- Phone Numbers -->
+                <div class="info-item" data-aos="fade-up" data-aos-delay="400">
+                  <div class="icon-box">
+                    <i class="bi bi-telephone"></i>
+                  </div>
+                  <div class="content">
+                    <h4>Phone Number</h4>
+                    {% for phone in section.phone_numbers.splitlines %}
+                    <p>{{ phone }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <!-- Email Addresses -->
+                <div class="info-item" data-aos="fade-up" data-aos-delay="500">
+                  <div class="icon-box">
+                    <i class="bi bi-envelope"></i>
+                  </div>
+                  <div class="content">
+                    <h4>Email Address</h4>
+                    {% for email in section.email_addresses.splitlines %}
+                    <p>{{ email }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ================= CONTACT FORM ================= -->
+            <div class="col-lg-7">
+              <div class="contact-form" data-aos="fade-up" data-aos-delay="300">
+
+                <h3>Get In Touch</h3>
+                <p>{{ section.description }}</p>
+
+                <form method="post"
+                      action="{% url 'contact_submit' %}"
+                      class="php-email-form"
+                      data-aos="fade-up"
+                      data-aos-delay="200">
+
+                  {% csrf_token %}
+
+                  <div class="row gy-4">
+
+                    <div class="col-md-6">
+                      <input type="text"
+                            name="name"
+                            class="form-control"
+                            placeholder="Your Name"
+                            required>
+                    </div>
+
+                    <div class="col-md-6">
+                      <input type="email"
+                            name="email"
+                            class="form-control"
+                            placeholder="Your Email"
+                            required>
+                    </div>
+
+                    <div class="col-12">
+                      <input type="text"
+                            name="subject"
+                            class="form-control"
+                            placeholder="Subject"
+                            required>
+                    </div>
+
+                    <div class="col-12">
+                      <textarea name="message"
+                                rows="6"
+                                class="form-control"
+                                placeholder="Message"
+                                required></textarea>
+                    </div>
+
+                    <div class="col-12 text-center">
+                      <button type="submit" class="btn">
+                        Send Message
+                      </button>
+                    </div>
+
+                  </div>
+                </form>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {% endif %}
+        {% endfor %}
+
+      </section><!-- /Contact Section -->
+    {% endif %}
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+
+    <div class="container">
+      <div class="copyright text-center ">
+        <p>© <span>Copyright</span> <strong class="px-1 sitename">Ravi Ranjan</strong> <span>All Rights Reserved</span></p>
+      </div>
+      {% if resume.socials.all %}
+      <div class="social-links d-flex justify-content-center">
+        {% for social in resume.socials.all %}
+          {% if social.is_active %}
+              <a href="{{ social.url }}" target="_blank" class="mx-2 social-icon"><i class="{{ social.icon_class }}"></i></a>
+            {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/typed.js/typed.umd.js' %}"></script>
+  <script src="{% static 'assets/vendor/waypoints/noframework.waypoints.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+
+</body>
+
+</html>

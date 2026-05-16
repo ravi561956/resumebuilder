@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Resume</title>
+</head>
+<body>
+
+<h2>Edit Resume</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Save</button>
+</form>
+
+<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+
+</body>
+</html>
