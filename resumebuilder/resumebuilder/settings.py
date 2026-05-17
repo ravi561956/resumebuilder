@@ -148,7 +148,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
@@ -183,11 +182,11 @@ PASSWORD_RESET_HTML_EMAIL_TEMPLATE_NAME = "auth/reset_password_email.html"
 PASSWORD_RESET_SUBJECT_TEMPLATE_NAME = "auth/reset_password_subject.txt"
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = '127.0.0.1'
-EMAIL_PORT = 1025
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = False
-EMAIL_USE_TLS = False
+# EMAIL_HOST = '127.0.0.1'
+# EMAIL_PORT = 1025
+# EMAIL_USE_TLS = False
+# EMAIL_USE_SSL = False
+# EMAIL_USE_TLS = False
 CSRF_TRUSTED_ORIGINS = [
     "http://*.lvh.me:8000",
     "http://lvh.me:8000",
