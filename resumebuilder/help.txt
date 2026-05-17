@@ -39,3 +39,7 @@ module used:
 python-docx
 pdfkit
 Pillow
+django-ckeditor-5
+bs4
+beautifulsoup4
+social-auth-app-django
