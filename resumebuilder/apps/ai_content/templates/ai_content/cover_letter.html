@@ -1,0 +1,18 @@
+{% extends "auth_base.html" %}
+{% block title %}AI Cover Letter{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width: 1000px">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div><h2>AI Cover Letter</h2><p class="text-muted">Tailored to your resume and the job description.</p></div>
+    <a href="{% url 'ai_content:dashboard' %}" class="btn btn-outline-secondary">AI Dashboard</a>
+  </div>
+  {% if not setting.enabled %}<div class="alert alert-warning">Cover letter generation is disabled.</div>{% endif %}
+  <div class="card shadow-sm"><div class="card-body">
+    <form method="post">{% csrf_token %}
+      {% for field in form %}<div class="mb-3"><label class="form-label">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endfor %}
+      <button class="btn btn-primary" {% if not setting.enabled %}disabled{% endif %}>Generate Cover Letter</button>
+    </form>
+  </div></div>
+  {% if result %}<div class="card shadow-sm mt-4"><div class="card-body"><h5>Generated Cover Letter</h5><textarea class="form-control" rows="18" readonly>{{ result.output }}</textarea><div class="small text-muted mt-2">{% if result.is_free %}Free generation{% else %}{{ result.charged_tokens }} credits used{% endif %}</div></div></div>{% endif %}
+</div>
+{% endblock %}

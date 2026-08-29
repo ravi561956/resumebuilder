@@ -1,0 +1,59 @@
+{% extends "auth_base.html" %}
+{% block title %}AI Content{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div><h2>AI Content</h2><p class="text-muted mb-0">Create resume content and cover letters with AI.</p></div>
+    <div class="text-end"><strong>{{ balance.available_tokens|default:0 }}</strong><br><small>AI credits available</small></div>
+  </div>
+
+  {% if ai_setting.ai_content_enabled and ai_setting.paid_ai_required %}
+  <div class="card shadow-sm mb-4"><div class="card-body">
+    <h5>Buy AI Credits</h5>
+    <div class="row g-3">
+      {% for package in packages %}
+      <div class="col-md-4"><div class="border rounded p-3 h-100">
+        <h6>{{ package.name }}</h6><p>{{ package.description }}</p>
+        <div class="fs-4 mb-2">₹{{ package.price }}</div>
+        <div class="mb-3">{{ package.tokens }} AI credits</div>
+        <button class="btn btn-primary buy-ai-package" data-package-id="{{ package.id }}">Purchase</button>
+      </div></div>
+      {% empty %}<p>No AI packages are currently available.</p>{% endfor %}
+    </div>
+  </div></div>
+  {% elif not ai_setting.ai_content_enabled %}
+    <div class="alert alert-warning">AI content generation is currently disabled.</div>
+  {% endif %}
+
+  {% if cover_setting.enabled %}
+  <div class="card shadow-sm mb-4"><div class="card-body">
+    <h5>Cover Letter</h5>
+    <p class="text-muted">{% if cover_setting.free_for_users %}Free for normal users.{% else %}Uses your AI credits.{% endif %}</p>
+    <a href="{% url 'ai_content:cover_letter' %}" class="btn btn-outline-primary">Create Cover Letter</a>
+  </div></div>
+  {% endif %}
+
+  <a href="/admin/" class="btn btn-outline-secondary">Edit Resume</a>
+</div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+(function(){
+  function csrf(){return document.cookie.split('; ').find(x=>x.startsWith('csrftoken='))?.split('=')[1] || '{{ csrf_token }}';}
+  document.querySelectorAll('.buy-ai-package').forEach(function(btn){
+    btn.addEventListener('click', async function(){
+      btn.disabled=true;
+      try {
+        const r=await fetch('{% url "ai_content:dashboard" %}packages/'+btn.dataset.packageId+'/order/', {method:'POST',headers:{'X-CSRFToken':csrf(),'X-Requested-With':'XMLHttpRequest'}});
+        const data=await r.json(); if(!r.ok) throw new Error(data.error||'Unable to create order');
+        const options={key:data.key_id,amount:data.amount,currency:data.currency,name:'Resume Builder',description:data.package_name,order_id:data.order_id,
+          prefill:{name:data.user_name,email:data.user_email},handler:async function(response){
+            const vr=await fetch('{% url "ai_content:verify_payment" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':csrf()},body:JSON.stringify({...response,purchase_id:data.purchase_id})});
+            const vd=await vr.json(); if(!vr.ok) throw new Error(vd.error||'Payment verification failed'); alert('Payment successful. Credits added: '+vd.available_tokens); location.reload();
+          }};
+        new Razorpay(options).open();
+      } catch(e){alert(e.message);} finally{btn.disabled=false;}
+    });
+  });
+})();
+</script>
+{% endblock %}

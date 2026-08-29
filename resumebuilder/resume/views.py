@@ -14,7 +14,7 @@ from django.contrib.auth.views import PasswordResetConfirmView
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from .models import Resume, ContactSection
-from .forms import RegisterForm, ResumeForm, ContactForm
+from .forms import RegisterForm, ResumeForm, ContactForm, UserLoginForm
 # ✅ Correct imports (cleaned)
 from .utils.session_utils import get_user_sessions, delete_user_sessions
 from .utils.resume_pdf import generate_resume_pdf
@@ -32,7 +32,7 @@ from apps.whatsapp.services.whatsapp_service import (
 from apps.whatsapp.utils.otp import generate_otp
 from django.db import IntegrityError
 
-
+    
 # ✅ Define async email sender
 def send_otp_email(otp, user):
     subject = "Your OTP Code"
@@ -222,8 +222,8 @@ def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
             email = form.cleaned_data['email']
+            username = email.split("@")[0]
             password = form.cleaned_data['password']
             subdomain = form.cleaned_data['subdomain']
             phone = form.cleaned_data['phone']
@@ -531,90 +531,124 @@ def resend_otp(request):
 # -------------------------
 @never_cache
 def user_login(request):
-    # already logged in
+    # Already logged in
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        return redirect("dashboard")
+
+    form = UserLoginForm(request.POST or None)
 
     if request.method == "POST":
-        username = request.POST.get(
-            'username'
-        )
-        password = request.POST.get(
-            'password'
-        )
 
-        # first check if user exists
-        try:
-            existing_user = User.objects.get(
-                username=username
-            )
-
-            # user exists but not verified
-            if not existing_user.is_active:
-                request.session['user_id'] = (
-                    existing_user.id
-                )
-                messages.warning(
-                    request,
-                    "Please verify your OTP first."
-                )
-                return redirect(
-                    'verify_otp'
-                )
-        except User.DoesNotExist:
-            messages.error(
+        # -----------------------------
+        # FORM VALIDATION
+        # -----------------------------
+        if not form.is_valid():
+            return render(
                 request,
-                "User does not exist."
-            )
-            return redirect(
-                'user_login'
+                "auth/user_login.html",
+                {
+                    "form": form,
+                },
             )
 
-        # authenticate user
+        # -----------------------------
+        # GET CLEANED CREDENTIALS
+        # -----------------------------
+        email = form.cleaned_data["email"].strip()
+        password = form.cleaned_data["password"]
+
+        # UserLoginForm has already resolved the email to the account whose
+        # password matches. Do not call User.objects.get(email=...) here: a
+        # legacy database can contain duplicate email addresses.
+        existing_user = form.get_user()
+
+        if existing_user is None:
+            messages.error(request, "Unable to find the account for this login.")
+            return render(request, "auth/user_login.html", {"form": form})
+
+        # -----------------------------
+        # CHECK OTP VERIFICATION
+        # -----------------------------
+        if not existing_user.is_active:
+            request.session["user_id"] = existing_user.id
+
+            messages.warning(
+                request,
+                "Your account is not verified. Please verify your OTP first."
+            )
+
+            return redirect("verify_otp")
+        
+        if existing_user.is_superuser:
+            messages.warning(
+                request,
+                "This is not a valid account."
+            )
+            return redirect("user_login")
+            
+        # -----------------------------
+        # AUTHENTICATE USER
+        # -----------------------------
         user = authenticate(
             request,
-            username=username,
-            password=password
+            username=existing_user.username,
+            password=password,
         )
-        # invalid password
-        if not user:
+
+        # -----------------------------
+        # INVALID PASSWORD
+        # -----------------------------
+        if user is None:
             messages.error(
                 request,
-                "Invalid username or password."
+                "Invalid email or password."
             )
-            return redirect(
-                'user_login'
+
+            return render(
+                request,
+                "auth/user_login.html",
+                {
+                    "form": form,
+                },
             )
-            
-        # final safety check
+
+        # -----------------------------
+        # FINAL ACTIVE CHECK
+        # -----------------------------
         if not user.is_active:
-            request.session['user_id'] = (
-                user.id
-            )
+            request.session["user_id"] = user.id
+
             messages.warning(
                 request,
                 "Please verify your OTP first."
             )
-            return redirect(
-                'verify_otp'
-            )
 
-        # login success
+            return redirect("verify_otp")
+
+        # -----------------------------
+        # LOGIN
+        # -----------------------------
         login(
             request,
-            user
+            user,
+            backend="django.contrib.auth.backends.ModelBackend",
         )
+
         messages.success(
             request,
             f"Welcome {user.username}"
         )
-        return redirect(
-            'dashboard'
-        )
 
-    return redirect(
-            '/admin'
-        )
+        return redirect("dashboard")
+
+    # GET request
+    return render(
+        request,
+        "auth/user_login.html",
+        {
+            "form": form,
+        },
+    )
 
 
 # -------------------------
@@ -799,13 +833,17 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 
  
 def csrf_failure(request, reason=""):
-    
+    # CSRF failures are not necessarily OTP/session failures. In particular,
+    # the Django admin login must be allowed to return to its own login page.
     messages.error(
         request,
-        "Your session expired. Please verify OTP again."
+        "Your session expired or the security token was invalid. Please try again."
     )
 
-    return redirect('verify_otp')
+    if request.path.startswith("/admin/"):
+        return redirect("/admin/login/")
+
+    return redirect("user_login")
 
 
 @csrf_protect
@@ -899,6 +937,76 @@ def verify_whatsapp_otp(request):
         request,
         "auth/otp/verify_whatsapp_otp.html"
     )
+
+
+# -------------------------
+# RESEND WHATSAPP OTP
+# -------------------------
+@never_cache
+def resend_whatsapp_otp(request):
+
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        messages.error(request, "Session expired.")
+        return redirect('register')
+
+    try:
+        user = User.objects.get(id=user_id)
+
+    except User.DoesNotExist:
+        messages.error(request, "User not found.")
+        return redirect('register')
+
+    try:
+        resume = Resume.objects.get(user=user)
+
+    except Resume.DoesNotExist:
+        messages.error(request, "Resume not found for this account.")
+        return redirect('register')
+
+    otp = str(random.randint(100000, 999999))
+
+    otp_obj, created = OTPVerification.objects.get_or_create(
+        user=user
+    )
+
+    otp_obj.whatsapp_otp = otp
+    otp_obj.whatsapp_verified = False
+    otp_obj.whatsapp_attempts = 0
+    otp_obj.expires_at = timezone.now() + timedelta(minutes=10)
+
+    otp_obj.save()
+
+    phone = str(resume.phone)
+    phone = phone.replace("+", "")
+    phone = phone.replace(" ", "")
+
+    if not phone.startswith("91"):
+        phone = "91" + phone
+
+    otp_message = get_whatsapp_message(
+        "otp",
+        {
+            "username": user.username,
+            "otp": otp,
+            "email": user.email,
+        }
+    )
+
+    if otp_message:
+        threading.Thread(
+            target=WhatsAppService.send,
+            args=(phone, otp_message),
+            daemon=True
+        ).start()
+
+    messages.success(
+        request,
+        "New OTP sent to your WhatsApp."
+    )
+
+    return redirect('verify_whatsapp_otp')
 
 
 def test_whatsapp(request):

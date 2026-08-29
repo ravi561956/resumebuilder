@@ -1,0 +1,30 @@
+resumebuilder/db.sqlite3
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# SQLite database
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+
+# Django generated files
+staticfiles/
+media/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

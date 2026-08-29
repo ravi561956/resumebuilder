@@ -21,12 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-968$5vtd%v*y$ef$mv%58gqxzz@q4n^q*rhnea3^ngi4h#i_@b'
+# Falls back to a dev-only key so local `manage.py runserver` still works
+# out of the box, but production deployments should always set DJANGO_SECRET_KEY.
+SECRET_KEY = os.getenv(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-968$5vtd%v*y$ef$mv%58gqxzz@q4n^q*rhnea3^ngi4h#i_@b',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')
 
 
 # Application definition
@@ -43,9 +48,14 @@ INSTALLED_APPS = [
     'apps.whatsapp.apps.WhatsappConfig',
     'social_django',
     'apps.social.apps.SocialConfig',
+    'apps.moderation',
+    'apps.ai_content.apps.AIContentConfig'
 ]
 
 MIDDLEWARE = [
+    # IMPORTANT: authentication/session cookies are shared on .lvh.me.
+    # Redirect 127.0.0.1/localhost to lvh.me so the session cookie is not lost.
+    'resume.middleware.LocalHostRedirectMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -182,14 +192,16 @@ PASSWORD_RESET_HTML_EMAIL_TEMPLATE_NAME = "auth/reset_password_email.html"
 PASSWORD_RESET_SUBJECT_TEMPLATE_NAME = "auth/reset_password_subject.txt"
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = '127.0.0.1'
-# EMAIL_PORT = 1025
-# EMAIL_USE_TLS = False
-# EMAIL_USE_SSL = False
-# EMAIL_USE_TLS = False
+EMAIL_HOST = '127.0.0.1'
+EMAIL_PORT = 1025
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = False
 CSRF_TRUSTED_ORIGINS = [
     "http://*.lvh.me:8000",
     "http://lvh.me:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
 ]
 
 # ✅ Share cookies across subdomains
@@ -200,9 +212,9 @@ CSRF_FAILURE_VIEW = 'resume.views.csrf_failure'
 # Prevent browser caching OTP page
 SESSION_SAVE_EVERY_REQUEST = True
 
-LOGIN_URL = '/admin/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/admin/'
+LOGOUT_REDIRECT_URL = '/'
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
@@ -228,6 +240,16 @@ SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY = ''
 SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET = ''
 
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard/'
-SOCIAL_AUTH_LOGIN_ERROR_URL = '/admin/'
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/login/'
 
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
+OPENAI_API_KEY = os.getenv(
+    "OPENAI_API_KEY"
+)
+
+# AI payment gateway (Razorpay). Keep secrets in environment variables.
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID', '')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', '')
+RAZORPAY_WEBHOOK_SECRET = os.getenv('RAZORPAY_WEBHOOK_SECRET', '')
+AZURE_OPENAI_API_VERSION = os.getenv('AZURE_OPENAI_API_VERSION', '2024-10-21')

@@ -24,7 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('resume.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
-    path('social-auth/', include('social_django.urls', namespace='social'))
+    path('social-auth/', include('social_django.urls', namespace='social')),
+    path('ai/', include('apps.ai_content.urls', namespace='ai_content')),
 ]
 
 if settings.DEBUG:
