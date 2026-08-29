@@ -3,6 +3,8 @@ from django.conf import settings
 from .utils.image_utils import resize_image
 from django_ckeditor_5.fields import CKEditor5Field
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from apps.moderation.services import validate_resume_content
 
 
 class Resume(models.Model):
@@ -33,7 +35,7 @@ class Resume(models.Model):
     ]
     position = models.CharField(default='Senior technical lead', max_length=250)
     address = models.CharField(default='Noida,India', max_length=250)
-    website = models.CharField(default='', max_length=250)
+    website = models.CharField(blank=True,default='', max_length=250)
     tags = models.CharField(
         max_length=255,
         blank=True,
@@ -50,15 +52,15 @@ class Resume(models.Model):
         choices=PDF_TEMPLATE_CHOICES,
         default='pdf1'
     )
-    short_desc = CKEditor5Field('Short Description', config_name='default')
+    short_desc = CKEditor5Field('Short Description', blank=True, config_name='default')
 
     profile_image = models.ImageField(upload_to='profile/', blank=True, null=True)
     banner_image = models.ImageField(upload_to='banner/', blank=True, null=True)
 
-    summary = CKEditor5Field('Summary', config_name='default')
-    skills = CKEditor5Field('Skills', config_name='default')
-    experience = CKEditor5Field('Experience', config_name='default')
-    education = CKEditor5Field('Education', config_name='default')
+    summary = CKEditor5Field('Summary', blank=True, config_name='default')
+    skills = CKEditor5Field('Skills', blank=True, config_name='default')
+    experience = CKEditor5Field('Experience', blank=True, config_name='default')
+    education = CKEditor5Field('Education', blank=True, config_name='default')
 
     theme = models.CharField(max_length=50, choices=THEME_CHOICES, default='meyawo-1.0.0')
 
@@ -86,12 +88,18 @@ class Resume(models.Model):
             return self.banner_image.url
         return settings.MEDIA_URL + 'defaults/default_banner.png'
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+        self.full_clean()
         if self.profile_image:
             resize_image(self.profile_image.path, (300, 300))
         if self.banner_image:
             resize_image(self.banner_image.path, (1600, 400))
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -112,7 +120,12 @@ class ResumeStat(models.Model):
     label = models.CharField(max_length=100, help_text="Label (e.g. Projects Completed)")
     aos_delay = models.PositiveIntegerField(default=300)
     order = models.PositiveIntegerField(default=0)
-
+    
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -146,6 +159,11 @@ class ResumeSocial(models.Model):
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -189,6 +207,11 @@ class ResumeFloatingCard(models.Model):
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -224,6 +247,11 @@ class ResumeSkill(models.Model):
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+    
     class Meta:
         ordering = ['order']
 
@@ -248,6 +276,11 @@ class ResumeJourney(models.Model):
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()    
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -269,6 +302,11 @@ class SkillCategory(models.Model):
     aos_delay = models.PositiveIntegerField(default=200)
     order = models.PositiveIntegerField(default=0)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -286,6 +324,11 @@ class Skill(models.Model):
     percentage = models.PositiveIntegerField()  # 95
     order = models.PositiveIntegerField(default=0)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -315,6 +358,11 @@ class Profession(models.Model):
     aos_delay = models.PositiveIntegerField(default=200)
     order = models.PositiveIntegerField(default=0)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -332,7 +380,11 @@ class Certification(models.Model):
     certificate_image = models.ImageField(upload_to='certificate/', blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -367,7 +419,12 @@ class Journey(models.Model):
     )
     aos_delay = models.PositiveIntegerField(default=200)
     order = models.PositiveIntegerField(default=0)
-
+    
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -389,7 +446,12 @@ class Excellence(models.Model):
 
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-
+    
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ["order"]
 
@@ -412,6 +474,11 @@ class ServiceSection(models.Model):
     aos_delay = models.PositiveIntegerField(default=200)
     order = models.PositiveIntegerField(default=0)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -443,6 +510,11 @@ class Service(models.Model):
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ["order"]
 
@@ -461,6 +533,11 @@ class PortfolioSection(models.Model):
     subtitle = models.TextField()
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     def __str__(self):
         return self.title
 
@@ -477,6 +554,11 @@ class PortfolioCategory(models.Model):
     )
     order = models.PositiveIntegerField(default=0)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -501,7 +583,12 @@ class PortfolioItem(models.Model):
 
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-
+    
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -530,6 +617,11 @@ class TestimonialSection(models.Model):
 
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        validate_resume_content(self)
+        
     def __str__(self):
         return self.title
 
@@ -569,6 +661,11 @@ class Testimonial(models.Model):
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -586,6 +683,11 @@ class ReviewPlatform(models.Model):
     name = models.CharField(max_length=50)
     url = models.URLField(blank=True, null=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     def __str__(self):
         return self.name
     
@@ -609,6 +711,11 @@ class FAQSection(models.Model):
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -629,6 +736,11 @@ class FAQ(models.Model):
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     class Meta:
         ordering = ['order']
 
@@ -662,6 +774,11 @@ class ContactSection(models.Model):
 
     is_active = models.BooleanField(default=True)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     def __str__(self):
         return self.title
 
@@ -681,5 +798,10 @@ class ContactMessage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 
+    def clean(self):
+        super().clean()
+        # Lazy import prevents circular imports
+        # validate_resume_content(self)
+        
     def __str__(self):
         return f"{self.name} – {self.subject}"

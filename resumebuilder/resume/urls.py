@@ -19,7 +19,7 @@ urlpatterns = [
     path('logout-all/', logout_all_devices, name='logout_all_devices'),
     path('resume/pdf/', download_resume_pdf, name='resume_pdf'),
     path('resume/doc/', download_resume_docx, name='resume_doc'),
-    path('resume:preview-pdf/<int:pk>/', preview_resume_pdf, name='resume_pdf_preview'),
+    path('resume/preview-pdf/<int:pk>/', preview_resume_pdf, name='resume_pdf_preview'),
     path('change-password/', CustomPasswordChangeView.as_view(), name='change_password'),
     path('change-password/done/', auth_views.PasswordChangeDoneView.as_view(
         template_name='auth/change_password_done.html'
@@ -48,5 +48,10 @@ urlpatterns = [
         'verify-whatsapp-otp/',
         verify_whatsapp_otp,
         name='verify_whatsapp_otp'
+    ),
+    path(
+        'resend-whatsapp-otp/',
+        resend_whatsapp_otp,
+        name='resend_whatsapp_otp'
     ),
 ]

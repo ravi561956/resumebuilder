@@ -1,0 +1,28 @@
+{% extends "admin/change_form.html" %}
+{% block after_field_sets %}
+  {{ block.super }}
+  {% if original %}
+  <div id="ai-content-admin-box" class="module" data-endpoint="{% url 'ai_content:generate_resume_content' %}" style="margin-top:20px;">
+    <h2>AI Content Assistant</h2>
+    <div style="padding:15px;">
+      <p style="margin-top:0;">AI generation is available for resume content fields. Paid access and credits are controlled by the super administrator.</p>
+      <label for="ai-field"><strong>Resume field</strong></label>
+      <select id="ai-field" style="margin:0 10px 10px 8px;">
+        <option value="short_desc">Short Description</option>
+        <option value="summary">Summary</option>
+        <option value="skills">Skills</option>
+        <option value="experience">Experience</option>
+        <option value="education">Education</option>
+      </select>
+      <label for="ai-instruction"><strong>Instruction</strong></label>
+      <textarea id="ai-instruction" rows="4" style="width:100%;margin-top:8px;" placeholder="Example: Rewrite my experience as an ATS-friendly senior Drupal developer summary using only my existing information."></textarea>
+      <div style="margin-top:10px;">
+        <button type="button" class="button" id="ai-generate-btn">Generate with AI</button>
+        <span id="ai-credit-status" style="margin-left:12px;"></span>
+      </div>
+      <label for="ai-result" style="display:block;margin-top:15px;"><strong>AI Result</strong></label>
+      <textarea id="ai-result" rows="8" style="width:100%;" readonly></textarea>
+    </div>
+  </div>
+  {% endif %}
+{% endblock %}
